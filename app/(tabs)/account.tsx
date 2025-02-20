@@ -18,6 +18,7 @@ export default function Account() {
             {sheetOpen && (
                 <PictureBottomSheet
                     isOpen={sheetOpen}
+                    
                     onClose={() => setSheetOpen(false)}
                 />
             )}

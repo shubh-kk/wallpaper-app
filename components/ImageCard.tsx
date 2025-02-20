@@ -12,7 +12,7 @@ interface ImageCardProps {
 
 export function ImageCard({ item, onPress }: ImageCardProps) {
     const { width: windowWidth } = useWindowDimensions();
-    
+
     // Responsive calculations
     const isTablet = windowWidth >= 768;
     const columns = isTablet ? 3 : 2;
@@ -23,23 +23,23 @@ export function ImageCard({ item, onPress }: ImageCardProps) {
     }
 
     return (
-        <Pressable onPress={handlePress}>   
+        <Pressable onPress={handlePress}>
             <View style={[
-                styles.container, 
-                { 
+                styles.container,
+                {
                     width: cardWidth,
                     height: isTablet ? 400 : 230 // Increased from 280 to 320 for tablets
                 }
-            ]}>
-                <Image 
-                    source={{ uri: item.url }} 
+            ]}> 
+                <Image
+                    source={{ uri: item.url }}
                     style={[
                         styles.image,
                         { height: isTablet ? 400 : 230 } // Increased from 280 to 320 for tablets
                     ]}
                     accessibilityLabel={item.name}
                 />
-                <Text 
+                <Text
                     style={styles.title}
                     numberOfLines={1}
                     accessibilityRole="text"

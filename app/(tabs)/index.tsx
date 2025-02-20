@@ -2,10 +2,9 @@ import { useCallback, useState } from 'react';
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ImageCard } from "@/components/ImageCard";
 import { useWallpaper, Wallpaper } from "@/hooks/useWallpaper";
-import { View, StyleSheet, Image, FlatList, useWindowDimensions } from "react-native";
+import { View, StyleSheet, Image, FlatList, useWindowDimensions,StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PictureBottomSheet } from '@/components/BottomSheet';
-import { StatusBar } from 'expo-status-bar';
 
 export default function Explore() {
     const { width: windowWidth } = useWindowDimensions();
@@ -35,6 +34,7 @@ export default function Explore() {
 
     return (
         <SafeAreaView style={styles.container}>
+            <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
             <ParallaxScrollView
                 headerBackgroundColor={{ dark: 'white', light: 'white' }}
                 headerImage={
