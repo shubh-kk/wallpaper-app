@@ -1,19 +1,25 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ImageCard } from "@/components/ImageCard";
 import { useWallpaper, Wallpaper } from "@/hooks/useWallpaper";
 import { View, StyleSheet, Image, FlatList, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { PictureBottomSheet } from '@/components/BottomSheet';
+import { StatusBar } from 'expo-status-bar';
 
 export default function Explore() {
     const { width: windowWidth } = useWindowDimensions();
     const { wallpapers } = useWallpaper();
 
+    const [selectedWallpaper, setSelectedWallpaper] = useState<Wallpaper | null>(null);
+
     const isTablet = windowWidth >= 768;
     const numColumns = isTablet ? 3 : 2;
 
+
     const handleImagePress = useCallback((item: Wallpaper) => {
-        console.log('Image pressed:', item.name);
+        console.log('Image pressed:', item.name)    ;
+        setSelectedWallpaper(item); 
     }, []);
 
     const renderItem = useCallback(({ item }: { item: Wallpaper }) => (
@@ -58,6 +64,9 @@ export default function Explore() {
                     />
                 </View>
             </ParallaxScrollView>
+            {/* isOpen={!!selectedWallpaper} means that if selectedWallpaper 
+            is not null, undefined, any empty/falsy value, then render the PictureBottomSheet */}
+            {selectedWallpaper && <PictureBottomSheet wallpaper={selectedWallpaper} isOpen={!!selectedWallpaper} onClose={() => setSelectedWallpaper(null)} />}
         </SafeAreaView>
     );
 }

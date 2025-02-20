@@ -23,7 +23,7 @@ export function ImageCard({ item, onPress }: ImageCardProps) {
     }
 
     return (
-        <Pressable onPress={handlePress}>
+        <Pressable onPress={handlePress}>   
             <View style={[
                 styles.container, 
                 { 

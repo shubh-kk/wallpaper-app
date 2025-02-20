@@ -1,14 +1,18 @@
-import { useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { useCallback, useMemo, useRef } from 'react';
+import { View, Text, StyleSheet, Dimensions, Image, Button } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import { Wallpaper } from '@/hooks/useWallpaper';
 // import { createStackNavigator } from '@react-navigation/stack';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
-export const PictureBottomSheet = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+export const PictureBottomSheet = ({ wallpaper, isOpen, onClose }: { wallpaper:  Wallpaper, isOpen: boolean; onClose: () => void }) => {
     // ref
     const bottomSheetRef = useRef<BottomSheet>(null);
+
+    ///var
+    const snapPoints = useMemo(() => ['50%', '75%', '100%'], []);
 
     // callbacks
     const handleSheetChanges = useCallback((index: number) => {
@@ -23,7 +27,7 @@ export const PictureBottomSheet = ({ isOpen, onClose }: { isOpen: boolean; onClo
             <GestureHandlerRootView style={styles.container}>
                 <BottomSheet
                     ref={bottomSheetRef}
-                    snapPoints={['90%']}
+                    snapPoints={['100%']}
                     onChange={handleSheetChanges}
                     enablePanDownToClose={true}
                     index={isOpen ? 0 : -1}
@@ -32,7 +36,14 @@ export const PictureBottomSheet = ({ isOpen, onClose }: { isOpen: boolean; onClo
                     handleComponent={null} // This hides the handles
                 >
                     <BottomSheetView style={styles.contentContainer}>
-                        <Text>Awesome 🎉</Text>
+                        <Image
+                            source={{ uri: wallpaper.url }}
+                            style={styles.image} 
+                        />
+                        <Text style={{ fontSize: 26, fontWeight: 'bold', marginBottom: 24 }}>{wallpaper.name}</Text>
+                        <View style={styles.button}>
+                            <Button title='Download' />
+                        </View>
                     </BottomSheetView>
                 </BottomSheet>
             </GestureHandlerRootView>
@@ -60,11 +71,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     handleStyle: {
-        backgroundColor: 'white',
-        borderTopLeftRadius: 15,
-        borderTopRightRadius: 15,
+        display: 'none',
     },
     backgroundStyle: {
-        backgroundColor: 'white',
+        backgroundColor: 'red',
+        borderRadius: 0,
+        marginTop: 0
     },
+    button:{
+        padding: 6,
+        width: 200,
+        borderRadius: 10,
+    },
+    image: {
+        width: "100%",
+        height:SCREEN_HEIGHT * 0.7 ,
+        borderRadius: 10,
+        marginBottom: 16,
+        resizeMode: 'cover', 
+    }
 });
