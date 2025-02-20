@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, Image, Button, StatusBar, Platform } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Wallpaper } from '@/hooks/useWallpaper';
 import Entypo from '@expo/vector-icons/Entypo';
@@ -106,21 +106,25 @@ export const PictureBottomSheet = ({ isOpen, wallpaper, onClose }: PictureBottom
                     handleComponent={null} // This hides the handles
                 >
                     <BottomSheetView style={styles.contentContainer}>
-                        <View style={styles.headerContainer}>
-                            <Entypo name="cross" color="#000" size={34} onPress={onClose} />
-                        </View>
                         <View style={styles.imageContainer}>
-                            <Image
-                                source={{ uri: wallpaper.url }}
-                                style={styles.image}
-                                resizeMode="contain"
-                            />
+
+                            <View style={styles.closeIconContainer}>
+                                <Entypo name="cross" color="white" size={34} onPress={onClose} />
+                            </View>
+
+                            {/* Like Icon */}
+                            <View style={styles.likeIconContainer}>
+                                <AntDesign name="hearto" color="white" size={38} />
+                            </View>
+
+                            <Image source={{ uri: wallpaper.url }} style={styles.image} resizeMode="cover" />
                         </View>
+
                         <ThemedText style={styles.title}>{wallpaper.name}</ThemedText>
-                        <View style={styles.button}>
-                            <AntDesign name="stepforward" size={44} color="white" />
-                            <Button title='Download' onPress={downloadImage} />
-                        </View>
+                        <TouchableOpacity style={styles.downloadButton} onPress={downloadImage}>
+                            <AntDesign name="download" size={24} color="white" style={{ marginRight: 8 }} />
+                            <Text style={styles.downloadText}>Download</Text>
+                        </TouchableOpacity>
                     </BottomSheetView>
                 </BottomSheet>
             </GestureHandlerRootView>
@@ -147,29 +151,27 @@ const styles = StyleSheet.create({
         marginTop: 0,
 
     },
-    header: {
+    headerContainer: {
+        width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        width: '100%',
-    },
-    spacer: {
-        flex: 1,
-    },
-    imageContainer: {
-        width: '100%',
-        height: SCREEN_HEIGHT * 0.6,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 2,
-        marginBottom: 16,
-        borderRadius: 20,
+        marginLeft: 1,
+        marginTop: 12,
+        marginBottom: 14,
+        paddingVertical: 8,
     },
     image: {
         width: "100%",
-        height: SCREEN_HEIGHT * 0.7,
-        borderRadius: 20,
-        marginBottom: 16,
-        resizeMode: 'cover',
+        height: "100%", // Ensure it fills the container
+        borderRadius: 14,
+        marginBottom: 14,
+    },
+    imageWrapper: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.25,
+        shadowRadius: 10,
+        elevation: 8, // Shadow for Android
     },
     handleStyle: {
         display: 'none',
@@ -180,31 +182,59 @@ const styles = StyleSheet.create({
         marginTop: 0
     },
     title: {
-        fontSize: 26,
+        fontSize: 22,
         fontWeight: 'bold',
         marginTop: 26,
-        marginBottom: 8,
+        marginBottom: 12,
         textAlign: 'center',
         color: 'black',
     },
-    button: {
-        backgroundColor: 'black',
-        padding: 6,
-        width: SCREEN_WIDTH * 0.7,
-        margin: 10, 
-        borderRadius: 25,
-        flex: 1,
-        alignSelf: 'center',
-        
+    downloadText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
-    // ADDED: New styles for the header container and back icon
-    headerContainer: {
+    closeIconContainer: {
+        position: 'absolute',
+        top: 29,
+        left: 16,
+        zIndex: 10, // Ensures it stays above the image
+        backgroundColor: 'rgba(0,0,0,0.3)', // Light transparent bg for visibility
+        padding: 2,
+        borderRadius: 50,
+    },
+    likeIconContainer: {
+        position: 'absolute',
+        top: 29,
+        right: 16,
+        zIndex: 10,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        padding: 2,
+        borderRadius: 50,
+    },   
+    imageContainer: {
         width: '100%',
+        height: SCREEN_HEIGHT * 0.7,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 2,
+        marginBottom: 16,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        overflow: 'hidden',
+        position: 'relative', // Ensures icon positioning inside
+    },
+    
+    downloadButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginLeft: 14,
-        marginTop: 14,
-        marginBottom: 14,
+        justifyContent: 'center',
+        backgroundColor: 'black',
+        padding: 12,
+        borderRadius: 25,
+        width: SCREEN_WIDTH * 0.7,
+        alignSelf: 'center',
+        marginTop: 10, // Add spacing after image
+        zIndex: 5, // Ensure it's above bottom sheet
     },
-
 });
