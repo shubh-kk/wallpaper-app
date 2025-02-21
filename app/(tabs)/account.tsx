@@ -7,22 +7,12 @@ export default function Account() {
     const [sheetOpen, setSheetOpen] = useState(false);
 
     return (
-        <View style={styles.container}>
-            <SafeAreaView style={styles.content}>
-                <Text>Accounts Page</Text>
-                <Button 
-                    title="Open Bottom Sheet" 
-                    onPress={() => setSheetOpen(true)}
-                />
-            </SafeAreaView>
-            {sheetOpen && (
-                <PictureBottomSheet
-                    isOpen={sheetOpen}
-                    
-                    onClose={() => setSheetOpen(false)}
-                />
-            )}
-        </View>
+        <SafeAreaView style={styles.content}>
+            <View style={styles.container}>
+                
+
+            </View>
+        </SafeAreaView>
     );
 }
 
