@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import { FlatList, StyleSheet, View, useWindowDimensions } from "react-native";
 import { ImageCard } from "./ImageCard";
 import { PictureBottomSheet } from "./BottomSheet";
+import React from "react";
 
 export const SplitView = ({ wallpapers }: { wallpapers: Wallpaper[] }) => {
     const { width: windowWidth } = useWindowDimensions();
@@ -37,7 +38,7 @@ export const SplitView = ({ wallpapers }: { wallpapers: Wallpaper[] }) => {
                     key={`flatList-${numColumns}`} // Key changes when numColumns changes
                     numColumns={numColumns}
                     columnWrapperStyle={styles.row}
-                    scrollEnabled={false}
+                    // scrollEnabled={false}
                     nestedScrollEnabled={true}
                     removeClippedSubviews={true}
                     initialNumToRender={isTablet ? 9 : 6}

@@ -1,6 +1,5 @@
 // app/(top-tabs)/_layout.tsx
 import { SplitView } from '@/components/SplitView';
-import { ProfileIcon } from '@/components/ui/ProfileIcon';
 import { useLibraryWallpapers, useLikedWallpapers, useSuggestedWallpapers, useWallpaper } from '@/hooks/useWallpaper';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { Text, StatusBar, StyleSheet, Dimensions } from 'react-native';

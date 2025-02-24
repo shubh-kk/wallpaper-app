@@ -1,15 +1,13 @@
 import { useCallback, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Image, Button, StatusBar, Platform, Modal } from 'react-native';
-import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image, StatusBar, Platform, Modal } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Wallpaper } from '@/hooks/useWallpaper';
 import Entypo from '@expo/vector-icons/Entypo';
 import { ThemedText } from './ThemedText';
-
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import AntDesign from '@expo/vector-icons/AntDesign';
-
+import { ThemedView } from './ThemedView';
 // import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -23,6 +21,7 @@ interface PictureBottomSheetProps {
 export const PictureBottomSheet = ({ isOpen, wallpaper, onClose }: PictureBottomSheetProps) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ['100%'], []); // Full screen
+    
 
     const handleSheetChanges = useCallback((index: number) => {
         if (index === -1) {
@@ -34,44 +33,44 @@ export const PictureBottomSheet = ({ isOpen, wallpaper, onClose }: PictureBottom
         try {
             // First, request permissions - using the newer MediaLibrary API directly
             const { status } = await MediaLibrary.requestPermissionsAsync();
-            
+
             if (status !== 'granted') {
                 alert('Sorry, we need media library permissions to save the image');
                 return;
             }
-            
+
             // Generate a unique filename with timestamp
             const filename = `wallpaper-${Date.now()}.jpg`;
             // Use cache directory for temporary storage
             const fileUri = `${FileSystem.cacheDirectory}${filename}`;
-            
+
             // Download the file to cache directory
             const downloadResult = await FileSystem.downloadAsync(
                 wallpaper.url,
                 fileUri
             );
-            
+
             if (downloadResult.status === 200) {
                 // Save the downloaded file to media library
                 try {
                     const asset = await MediaLibrary.createAssetAsync(fileUri);
-                    
+
                     // On Android, you can save to an album
                     if (Platform.OS === 'android') {
                         // Check if the Download album exists
                         const albums = await MediaLibrary.getAlbumsAsync();
                         const downloadAlbum = albums.find(album => album.title === 'Download');
-                        
+
                         if (downloadAlbum) {
                             await MediaLibrary.addAssetsToAlbumAsync([asset], downloadAlbum, false);
                         } else {
                             await MediaLibrary.createAlbumAsync('Download', asset, false);
                         }
                     }
-                    
+
                     // Clean up the cache file
                     await FileSystem.deleteAsync(fileUri, { idempotent: true });
-                    
+
                     alert('Image saved to your gallery successfully');
                 } catch (err) {
                     console.error("Error saving to media library:", err);
@@ -93,7 +92,7 @@ export const PictureBottomSheet = ({ isOpen, wallpaper, onClose }: PictureBottom
             animationType="slide"
             onRequestClose={onClose}
         >
-            <GestureHandlerRootView style={styles.overlay}>
+            <View style={styles.overlay}>
                 <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
                 <BottomSheet
                     ref={bottomSheetRef}
@@ -102,44 +101,45 @@ export const PictureBottomSheet = ({ isOpen, wallpaper, onClose }: PictureBottom
                     enablePanDownToClose
                     handleComponent={null}
                     index={0}
-                    backgroundStyle={{ marginTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
                 >
                     <BottomSheetView style={styles.contentContainer}>
-                        <View style={styles.imageContainer}>
-                            <View style={styles.closeIconContainer}>
-                                <Entypo name="cross" color="white" size={25} onPress={onClose} />
-                            </View>
+                            <ThemedView style={styles.imageContainer}>
+                                <Image source={{ uri: wallpaper.url }} style={styles.image} resizeMode="cover" />
+                                <View style={styles.closeIconContainer}>
+                                    <Entypo name="cross" color="white" size={25} onPress={onClose} />
+                                </View>
 
-                            {/* Like Icon */}
-                            <View style={styles.likeIconContainer}>
-                                <AntDesign name="hearto" color="white" size={25} />
-                            </View>
+                                {/* Like Icon */}
+                                <View style={styles.likeIconContainer}>
+                                    <AntDesign name="hearto" color="white" size={25} />
+                                </View>
 
-                            <Image source={{ uri: wallpaper.url }} style={styles.image} resizeMode="cover" />
+                            </ThemedView>
+
+                            <View style={styles.bottomContent}>
+                            <ThemedText style={styles.title}>{wallpaper.name}</ThemedText>
+                            <TouchableOpacity style={styles.downloadButton} onPress={downloadImage}>
+                                <AntDesign name="download" size={24} color="white" style={{ marginRight: 8 }} />
+                                <Text style={styles.downloadText}>Download</Text>
+                            </TouchableOpacity>
                         </View>
-
-                        <ThemedText style={styles.title}>{wallpaper.name}</ThemedText>
-                        <TouchableOpacity style={styles.downloadButton} onPress={downloadImage}>
-                            <AntDesign name="download" size={24} color="white" style={{ marginRight: 8 }} />
-                            <Text style={styles.downloadText}>Download</Text>
-                        </TouchableOpacity>
                     </BottomSheetView>
                 </BottomSheet>
-            </GestureHandlerRootView>
+            </View>
         </Modal>
     );
 };
 
 const styles = StyleSheet.create({
     overlay: {
-        flex: 1,   
+        flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
     },
     contentContainer: {
         flex: 1,
-        padding: 0,
-        alignItems: 'center',
-        justifyContent: 'center',
+        // padding: 0,
+        // alignItems: 'center',
+        // justifyContent: 'center',
     },
     imageContainer: {
         width: '100%',
@@ -150,11 +150,16 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 20,
         overflow: 'hidden',
         position: 'relative',
+        shadowColor: '#000',
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+
     },
     image: {
         width: '100%',
         height: '100%', // Now covers the full height of the container
-        resizeMode: 'cover',
+        // resizeMode: 'cover',
     },
     closeIconContainer: {
         position: 'absolute',
@@ -177,7 +182,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        marginTop: 10, // Reduced space between image and title
+        marginTop: 15, // Reduced space between image and title
         marginBottom: 12,
         textAlign: 'center',
         color: 'black',
@@ -191,12 +196,15 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         width: SCREEN_WIDTH * 0.7,
         alignSelf: 'center',
-        marginTop: 5, // Ensure it's visible on the screen
+        marginTop: 15 // Ensure it's visible on the screen
     },
     downloadText: {
         color: 'white',
         fontSize: 18,
         fontWeight: 'bold',
     },
-   
+    bottomContent: {
+        paddingHorizontal: 20,  
+        paddingVertical: 16,  
+    }
 });

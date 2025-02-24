@@ -6,7 +6,7 @@ import Animated, {
   useAnimatedStyle,
   useScrollViewOffset,
 } from 'react-native-reanimated';
-
+import React from 'react';
 import { ThemedView } from '@/components/ThemedView';
 import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -46,21 +46,26 @@ export default function ParallaxScrollView({
 
   return (
     <ThemedView style={styles.container}>
-      <Animated.ScrollView
-        ref={scrollRef}
+      <Animated.FlatList
+        data={[{ key: 'content' }]} // Dummy data to make FlatList work
+        renderItem={() => (
+          <>
+            <Animated.View
+              style={[
+                styles.header,
+                { backgroundColor: headerBackgroundColor[colorScheme] },
+                headerAnimatedStyle,
+              ]}>
+              {headerImage}
+            </Animated.View>
+            <ThemedView style={styles.content}>{children}</ThemedView>
+          </>
+        )}
+        keyExtractor={(item) => item.key}
         scrollEventThrottle={16}
-        scrollIndicatorInsets={{ bottom }}
-        contentContainerStyle={{ paddingBottom: bottom }}>
-        <Animated.View
-          style={[
-            styles.header,
-            { backgroundColor: headerBackgroundColor[colorScheme] },
-            headerAnimatedStyle,
-          ]}>
-          {headerImage}
-        </Animated.View>
-        <ThemedView style={styles.content}>{children}</ThemedView>
-      </Animated.ScrollView>
+        nestedScrollEnabled={true} // Allow nested scrolling
+        contentContainerStyle={{ paddingBottom: bottom }}
+      />
     </ThemedView>
   );
 }
