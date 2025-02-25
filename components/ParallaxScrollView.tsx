@@ -4,7 +4,8 @@ import Animated, {
   interpolate,
   useAnimatedRef,
   useAnimatedStyle,
-  useScrollViewOffset,
+  useAnimatedScrollHandler,
+  useSharedValue,
 } from 'react-native-reanimated';
 import React from 'react';
 import { ThemedView } from '@/components/ThemedView';
@@ -24,21 +25,29 @@ export default function ParallaxScrollView({
   headerBackgroundColor,
 }: Props) {
   const colorScheme = useColorScheme() ?? 'light';
-  const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffset = useScrollViewOffset(scrollRef);
+  const scrollRef = useAnimatedRef<Animated.FlatList>();
+  const scrollY = useSharedValue(0);
   const bottom = useBottomTabOverflow();
+  
+  // Use animated scroll handler instead of useScrollViewOffset
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
   const headerAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
         {
           translateY: interpolate(
-            scrollOffset.value,
+            scrollY.value,
             [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
             [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]
           ),
         },
         {
-          scale: interpolate(scrollOffset.value, [-HEADER_HEIGHT, 0, HEADER_HEIGHT], [2, 1, 1]),
+          scale: interpolate(scrollY.value, [-HEADER_HEIGHT, 0, HEADER_HEIGHT], [2, 1, 1]),
         },
       ],
     };
@@ -47,6 +56,7 @@ export default function ParallaxScrollView({
   return (
     <ThemedView style={styles.container}>
       <Animated.FlatList
+        ref={scrollRef}
         data={[{ key: 'content' }]} // Dummy data to make FlatList work
         renderItem={() => (
           <>
@@ -62,6 +72,7 @@ export default function ParallaxScrollView({
           </>
         )}
         keyExtractor={(item) => item.key}
+        onScroll={scrollHandler}
         scrollEventThrottle={16}
         nestedScrollEnabled={true} // Allow nested scrolling
         contentContainerStyle={{ paddingBottom: bottom }}

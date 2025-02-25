@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image, StatusBar, Platform, Modal } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Wallpaper } from '@/hooks/useWallpaper';
@@ -21,13 +21,18 @@ interface PictureBottomSheetProps {
 export const PictureBottomSheet = ({ isOpen, wallpaper, onClose }: PictureBottomSheetProps) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ['100%'], []); // Full screen
-    
+    const [isFavorite, setIsFavorite] = useState(false);  
 
     const handleSheetChanges = useCallback((index: number) => {
         if (index === -1) {
             onClose();
         }
     }, [onClose]);
+
+    const toggleFavorite = () => {
+        setIsFavorite(prev => !prev);
+        // alert('added to Favorites');
+    }
 
     const downloadImage = async () => {
         try {
@@ -103,18 +108,21 @@ export const PictureBottomSheet = ({ isOpen, wallpaper, onClose }: PictureBottom
                     index={0}
                 >
                     <BottomSheetView style={styles.contentContainer}>
-                            <ThemedView style={styles.imageContainer}>
-                                <Image source={{ uri: wallpaper.url }} style={styles.image} resizeMode="cover" />
-                                <View style={styles.closeIconContainer}>
-                                    <Entypo name="cross" color="white" size={25} onPress={onClose} />
-                                </View>
+                        <ThemedView style={styles.imageContainer}>
+                            <Image source={{ uri: wallpaper.url }} style={styles.image} resizeMode="cover" />
+                            <View style={styles.closeIconContainer}>
+                                <Entypo name="cross" color="white" size={30} onPress={onClose} />
+                            </View>
 
-                                {/* Like Icon */}
-                                <View style={styles.likeIconContainer}>
-                                    <AntDesign name="hearto" color="white" size={25} />
-                                </View>
+                            {/* Like Icon */}
+                            <View style={styles.likeIconContainer}>
+                                <AntDesign
+                                    name={isFavorite ? 'heart' : 'hearto'}
+                                    color={isFavorite ? 'red' : 'white'}
+                                    size={30} onPress={toggleFavorite} />
+                            </View>
 
-                            </ThemedView>
+                        </ThemedView>
 
                             <View style={styles.bottomContent}>
                             <ThemedText style={styles.title}>{wallpaper.name}</ThemedText>
@@ -163,8 +171,8 @@ const styles = StyleSheet.create({
     },
     closeIconContainer: {
         position: 'absolute',
-        top: 8,
-        left: 14,
+        top: 28,
+        left: 24,
         zIndex: 10, // Ensures it stays above the image
         backgroundColor: 'rgba(0,0,0,0.3)', // Light transparent bg for visibility
         padding: 2,
@@ -172,8 +180,8 @@ const styles = StyleSheet.create({
     },
     likeIconContainer: {
         position: 'absolute',
-        top: 8,
-        right: 16,
+        top: 28,
+        right: 24,
         zIndex: 10,
         backgroundColor: 'rgba(0,0,0,0.3)',
         padding: 2,
